@@ -4,11 +4,13 @@ import javax.swing.*;
 import java.awt.*;
 
 public class MainFrame extends JFrame{
+    JPanel currentPanel;
+
     public MainFrame(){
         //초기 설정
         setTitle("Lifetime visualization");
-        setSize(800,600);
-        setLocation(550,250);
+        setSize(500,300);
+        setLocationRelativeTo(null);
         setResizable(true); //UI에 문제 생길시 프레임 사이즈 고정
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -17,10 +19,36 @@ public class MainFrame extends JFrame{
         Image iconImg = kit.getImage("img/healthy-heart-icon.png");
         this.setIconImage(iconImg);
 
-        //패널 추가
-        MainPanel mainPanel = new MainPanel();
-        this.add(mainPanel);
+        //메인 패널 추가
+        currentPanel = new MainPanel(this);
+        this.add(currentPanel);
 
         setVisible(true);
+    }
+
+    //mouseEventAdapter 익명 클래스 안에 들어가는 패널 변경 함수
+
+    public void switchFromMainPanelToInputDataPanel(){
+        remove(currentPanel);
+        currentPanel = new InputDataPanel(this);
+        add(currentPanel);
+        revalidate();
+        repaint();
+    }
+
+    public void switchFromInputDataToMainPanel(){
+        remove(currentPanel);
+        currentPanel = new MainPanel(this);
+        add(currentPanel);
+        revalidate();
+        repaint();
+    }
+
+    public void switchFromInputDataToVisualizaiton() {
+        remove(currentPanel);
+        currentPanel = new VisualizationPanel(this);
+        add(currentPanel);
+        revalidate();
+        repaint();
     }
 }
