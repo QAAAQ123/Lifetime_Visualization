@@ -9,7 +9,7 @@ public class MainFrame extends JFrame{
     public MainFrame(){
         //초기 설정
         setTitle("Lifetime visualization");
-        setSize(500,300);
+        setSize(500,600);
         setLocationRelativeTo(null);
         setResizable(true); //UI에 문제 생길시 프레임 사이즈 고정
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -44,7 +44,23 @@ public class MainFrame extends JFrame{
         repaint();
     }
 
-    public void switchFromInputDataToVisualizaiton() {
+    public void switchFromInputDataToDataCheck(DataCheckPanel dataCheckPanel) {
+        remove(currentPanel);
+        currentPanel = dataCheckPanel;
+        add(currentPanel);
+        revalidate();
+        repaint();
+    }
+
+    public void switchFromDataCheckToInputData(){
+        remove(currentPanel);
+        currentPanel = new InputDataPanel(this);
+        add(currentPanel);
+        revalidate();
+        repaint();
+    }
+
+    public void switchFromDataCheckToVisualization() {
         remove(currentPanel);
         currentPanel = new VisualizationPanel(this);
         add(currentPanel);
