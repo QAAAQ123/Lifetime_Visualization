@@ -48,14 +48,14 @@ public class InputDataPanel extends JPanel {
             }
         });
 
-        //버튼 클릭시 시각화 화면으로 이동하며 2개 데이터 받아옴
+        //버튼 클릭시 데이터 확인 화면으로 이동하며 2개 데이터 던짐
         visualizationBtn.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 String selectedUnit = (String) unit.getSelectedItem();
                 String birthText = birth.getText();
 
-                DataCheckPanel data = new DataCheckPanel(selectedUnit, birthText,frame);
+                DataCheckPanel data = new DataCheckPanel(selectedUnit, birthText, frame);
 
                 frame.switchFromInputDataToDataCheck(data);
             }

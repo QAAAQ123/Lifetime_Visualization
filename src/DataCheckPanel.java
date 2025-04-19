@@ -36,8 +36,13 @@ public class DataCheckPanel extends JPanel {
         toVisualization.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if(CheckDateEffectiveness(birth))
+                if (CheckDateEffectiveness(birth)) {
                     frame.switchFromDataCheckToVisualization();
+                    String selectedUnit = unit;
+                    String brithText = birth;
+
+                    VisualizationPanel data = new VisualizationPanel(selectedUnit,brithText,frame);
+                }
                 else{
                     titleLabel.setText("날짜 형식이 잘못되었습니다. 다시 입력하세요");
                     remove(toVisualization);

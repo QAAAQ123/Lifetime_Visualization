@@ -67,4 +67,12 @@ public class MainFrame extends JFrame{
         revalidate();
         repaint();
     }
+
+    public void switchFromVisualizationToMain() {
+        remove(currentPanel);
+        currentPanel = new MainPanel(this);
+        add(currentPanel);
+        revalidate();
+        repaint();
+    }
 }
