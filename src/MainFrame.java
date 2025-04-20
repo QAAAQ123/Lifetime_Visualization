@@ -60,14 +60,6 @@ public class MainFrame extends JFrame{
         repaint();
     }
 
-    public void switchFromDataCheckToVisualization() {
-        remove(currentPanel);
-        currentPanel = new VisualizationPanel(this);
-        add(currentPanel);
-        revalidate();
-        repaint();
-    }
-
     public void switchFromVisualizationToMain() {
         remove(currentPanel);
         currentPanel = new MainPanel(this);

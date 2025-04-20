@@ -17,6 +17,7 @@ public class MainPanel extends JPanel{
         add(lifeTimeBtn);
         add(settingBtn);
 
+
         lifeTimeBtn.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {

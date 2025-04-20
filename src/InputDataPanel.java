@@ -23,13 +23,13 @@ public class InputDataPanel extends JPanel {
         row1.add(unit);
 
         //연,월,일 선택하는 컴포넌트 추가
-        birth = new JTextField("YYYY/MM/DD 형식",15);
+        birth = new JTextField("yyyy/MM/dd 형식",8);
         JPanel row2 = new JPanel(new FlowLayout());
         row2.add(new JLabel("생년월일"));
         row2.add(birth);
 
         //시각화 데이터 확인 페이지로 이동 버튼
-        visualizationBtn = new JButton("시각화 하기");
+        visualizationBtn = new JButton("입력한 데이터 확인");
 
         //메인 페이지로 이동 버튼
         toMain = new JButton("메인으로 돌아가기");
