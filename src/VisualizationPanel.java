@@ -8,7 +8,6 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.StringTokenizer;
 
 
@@ -32,12 +31,26 @@ import java.util.StringTokenizer;
 public class VisualizationPanel extends JPanel {
     private final String filledCircle = "⚫";
     private final String emptyCircle = "⚪";
+    private final String filledSquare = "⬛";
+    private final String emptySquare = "⬜";
     private JTextArea showing = new JTextArea();
+    private JButton toMain;
+    private JButton saveImg;
+
     public VisualizationPanel(String unit,String birth,MainFrame frame){
         setLayout(new FlowLayout(FlowLayout.LEFT,180,30));
+        SettingPanel setting = new SettingPanel(frame);
+        int[] value = setting.getLangAndShape();
 
-        JButton toMain = new JButton("메인으로 돌아가기");
-        JButton saveImg = new JButton("이미지로 저장하기");
+        switch(value[0]){
+            case 0:
+                toMain = new JButton("메인으로 돌아가기");
+                saveImg = new JButton("이미지로 저장하기");
+                break;
+            case 1:
+                toMain = new JButton("back to main");
+                saveImg = new JButton("saving for image");
+        }
 
         this.add(toMain);
         this.add(saveImg);
@@ -53,7 +66,8 @@ public class VisualizationPanel extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 saveImage();
-                JOptionPane.showMessageDialog(null, "이미지가 저장되었습니다.");
+                if(value[0] == 0) JOptionPane.showMessageDialog(null, "이미지가 저장되었습니다.");
+                else JOptionPane.showMessageDialog(null, "Image has been saved.");
             }
         });
 
@@ -69,11 +83,30 @@ public class VisualizationPanel extends JPanel {
         int splitOfBirth = 0;
         while(stringTokenizer.hasMoreTokens()) inputBirth[splitOfBirth++] = stringTokenizer.nextToken();
 
-        int inputYear = Integer.parseInt(inputBirth[0]);
-        int inputMonth = Integer.parseInt(inputBirth[1]);
+        int insertedMonth = 0;
+        int insertedYear = 0;
+        if(value[0] == 0) {
+            insertedYear = Integer.parseInt(inputBirth[0]);
+            insertedMonth = Integer.parseInt(inputBirth[1]);
+        }
+        else if(value[0] == 1){
+            insertedYear = Integer.parseInt(inputBirth[2]);
+            insertedMonth = Integer.parseInt(inputBirth[1]);
+        }
 
-        if(unit.equals("월")){
-            String[][] result = whenUnitIsMonth(currentYear,currnetMonth,inputYear,inputMonth);
+        String filled = "";
+        String empty = "";
+        if(value[1] == 0) {
+            filled = filledCircle;
+            empty = emptyCircle;
+        }else if(value[1] == 1){
+            filled = filledSquare;
+            empty = emptySquare;
+        }
+
+        //시각화 하기
+        if(unit.equals("월") || unit.equals("month")){
+            String[][] result = whenUnitIsMonth(currentYear,currnetMonth, insertedYear, insertedMonth,filled,empty);
             showing.setEditable(false);
             showing.setLineWrap(true);
             for(int i = 0;i < result.length; i++){
@@ -90,8 +123,8 @@ public class VisualizationPanel extends JPanel {
             frame.setLocation(700,0);
             revalidate();
             repaint();
-        }else if(unit.equals("년")){
-            String[][] result = whenUnitIsYear(currentYear,currnetMonth,inputYear,inputMonth);
+        }else if(unit.equals("년") || unit.equals("year")){
+            String[][] result = whenUnitIsYear(currentYear,currnetMonth, insertedYear, insertedMonth,filled,empty);
             for(int i = 0;i < result.length; i++){
                 for(int j = 0; j < result[0].length; j++){
                     showing.append(result[i][j]);
@@ -101,8 +134,8 @@ public class VisualizationPanel extends JPanel {
             this.add(showing);
             revalidate();
             repaint();
-        }else if(unit.equals("10년")){
-            String[] result = whenUnitIsDecade(currentYear,currnetMonth,inputYear,inputMonth);
+        }else if(unit.equals("10년") || unit.equals("10-year")){
+            String[] result = whenUnitIsDecade(currentYear,currnetMonth, insertedYear, insertedMonth,filled,empty);
             for(String i:result){
                 showing.append(i);
             }
@@ -110,7 +143,10 @@ public class VisualizationPanel extends JPanel {
             revalidate();
             repaint();
         }else{
-            JLabel errorMsg = new JLabel("에러 발생");
+            JLabel errorMsg = new JLabel();
+            if(value[0] == 0) errorMsg.setText("에러 발생");
+            else errorMsg.setText("Error occurred");
+
             errorMsg.setSize(10,10);
             this.add(errorMsg);
             revalidate();
@@ -121,7 +157,7 @@ public class VisualizationPanel extends JPanel {
     }
 
     //단위가 월인 경우 시각화 함수
-    private String[][] whenUnitIsMonth(int currentYear,int currentMonth,int inputYear,int inputMonth){
+    private String[][] whenUnitIsMonth(int currentYear,int currentMonth,int inputYear,int inputMonth,String filled,String empty){
 //        달 12x100
 //        1. '현재 연도-태어난 연도-1'만큼 1년(12개) 채운 동그라미를 넣어준다.
 //        2. '현재 월'만큼 채운 동그라미를 넣어준다.
@@ -134,23 +170,23 @@ public class VisualizationPanel extends JPanel {
 
         for(int i = 0;i < filledCircleByYear - 1; i++){
             for(int j = 0; j < visualization[0].length; j++){
-                visualization[i][j] = filledCircle;
+                visualization[i][j] = filled;
             }
         }
         for(int i = 0; i < filledCircleByMonth; i++){
-            visualization[filledCircleByYear -1 ][i] = filledCircle;
+            visualization[filledCircleByYear -1 ][i] = filled;
         }
         for(int i = 0;i < visualization.length; i++){
             for(int j = 0; j < visualization[0].length; j++){
                 if(visualization[i][j] == null)
-                    visualization[i][j] = emptyCircle;
+                    visualization[i][j] = empty;
             }
         }
         return visualization;
     }
 
     //단위가 년인경우
-    private String[][] whenUnitIsYear(int currentYear,int currentMonth,int inputYear,int inputMonth){
+    private String[][] whenUnitIsYear(int currentYear,int currentMonth,int inputYear,int inputMonth,String filled,String empty){
 //        연 10x10
 //        1. '현재 연도-태어난 연도'로 나이 계산
 //        2. '태어난 월-현재 월' 계산해서 음수이면 그대로, 0과 양수이면 -1을 해준다.
@@ -164,23 +200,23 @@ public class VisualizationPanel extends JPanel {
 
         for(int i = 0;i < tens; i++){
             for(int j = 0;j < visualization[0].length;j++){
-                visualization[i][j] = filledCircle;
+                visualization[i][j] = filled;
             }
         }
         for(int i = 0;i < ones;i++){
-            visualization[tens][i] = filledCircle;
+            visualization[tens][i] = filled;
         }
         for(int i = 0; i < visualization.length; i++){
             for(int j = 0; j<visualization[0].length; j++){
                 if(visualization[i][j] == null)
-                    visualization[i][j] = emptyCircle;
+                    visualization[i][j] = empty;
             }
         }
         return visualization;
     }
 
     //단위가 10년인 경우
-    private String[] whenUnitIsDecade(int currentYear,int currentMonth,int inputYear,int inputMonth){
+    private String[] whenUnitIsDecade(int currentYear,int currentMonth,int inputYear,int inputMonth,String filled,String empty){
 //        10년 10x1
 //        1.'현재 연도-태어난 연도'로 나이 계산
 //        2. '태어난 월-현재 월' 계산해서 음수이면 그대로, 0과 양수이면 -1을 해준다.
@@ -196,20 +232,20 @@ public class VisualizationPanel extends JPanel {
 
         //forEach문으로 바꾸기
         for(int i = 0; i <= tens;i++)
-            visualization[i] = filledCircle;
+            visualization[i] = filled;
         if(ones > 5){
-            visualization[ones] = filledCircle;
+            visualization[ones] = filled;
             for(int i = tens + 1; i< visualization.length; i++)
-                visualization[i] = emptyCircle;
+                visualization[i] = empty;
         }else{
             for(int i = tens; i < visualization.length; i++)
-                visualization[i] = emptyCircle;
+                visualization[i] = empty;
         }
 
         return visualization;
     }
 
-    public void switchFromInputToVisualization(MainFrame frame, DataCheckPanel dataCheckPanel) {
+    public void switchFromDataCheckToVisualization(MainFrame frame, DataCheckPanel dataCheckPanel) {
         frame.remove(dataCheckPanel);
         frame.currentPanel = this;
         frame.add(frame.currentPanel);

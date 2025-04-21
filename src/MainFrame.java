@@ -64,6 +64,8 @@ public class MainFrame extends JFrame{
         remove(currentPanel);
         currentPanel = new MainPanel(this);
         add(currentPanel);
+        setSize(500,600);
+        setLocationRelativeTo(null);
         revalidate();
         repaint();
     }
@@ -79,6 +81,14 @@ public class MainFrame extends JFrame{
     public void switchFromSettingToMain(){
         remove(currentPanel);
         currentPanel = new MainPanel(this);
+        add(currentPanel);
+        revalidate();
+        repaint();
+    }
+
+    public void switchFromDataCheckToVisualization(VisualizationPanel visualizationPanel) {
+        remove(currentPanel);
+        currentPanel = visualizationPanel;
         add(currentPanel);
         revalidate();
         repaint();
