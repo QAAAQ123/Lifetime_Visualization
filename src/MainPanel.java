@@ -24,5 +24,12 @@ public class MainPanel extends JPanel{
                 frame.switchFromMainPanelToInputDataPanel();
             }
         });
+
+        settingBtn.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                frame.switchFromMainToSetting();
+            }
+        });
     }
 }

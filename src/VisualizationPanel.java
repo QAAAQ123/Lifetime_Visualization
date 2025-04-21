@@ -1,9 +1,12 @@
 package src;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.StringTokenizer;
@@ -29,14 +32,15 @@ import java.util.StringTokenizer;
 public class VisualizationPanel extends JPanel {
     private final String filledCircle = "⚫";
     private final String emptyCircle = "⚪";
-
+    private JTextArea showing = new JTextArea();
     public VisualizationPanel(String unit,String birth,MainFrame frame){
         setLayout(new FlowLayout(FlowLayout.LEFT,180,30));
 
         JButton toMain = new JButton("메인으로 돌아가기");
-
+        JButton saveImg = new JButton("이미지로 저장하기");
 
         this.add(toMain);
+        this.add(saveImg);
 
         toMain.addMouseListener(new MouseAdapter() {
             @Override
@@ -45,6 +49,15 @@ public class VisualizationPanel extends JPanel {
             }
         });
 
+        saveImg.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                saveImage();
+                JOptionPane.showMessageDialog(null, "이미지가 저장되었습니다.");
+            }
+        });
+
+        //시각화 로직
         //현재 날짜 받아와서 연도,월 찾기
         LocalDate now = LocalDate.now();
         int currentYear = now.getYear();
@@ -60,20 +73,49 @@ public class VisualizationPanel extends JPanel {
         int inputMonth = Integer.parseInt(inputBirth[1]);
 
         if(unit.equals("월")){
-
-        }else if(unit.equals("년")){
-
-        }else if(unit.equals("10년")){
-            JLabel result = new JLabel(Arrays.toString(whenUnitIsDecade(currentYear,currnetMonth,inputYear,inputMonth)));
-            this.add(result);
-            repaint();
+            String[][] result = whenUnitIsMonth(currentYear,currnetMonth,inputYear,inputMonth);
+            showing.setEditable(false);
+            showing.setLineWrap(true);
+            for(int i = 0;i < result.length; i++){
+                for(int j = 0; j < result[0].length; j++){
+                    showing.append(result[i][j]);
+                }
+                showing.append("\n");
+            }
+            JScrollPane jScrollPane = new JScrollPane(showing);
+            jScrollPane.setPreferredSize(new Dimension(200,900));
+            jScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+            this.add(jScrollPane);
+            frame.setSize(500,1000);
+            frame.setLocation(700,0);
             revalidate();
+            repaint();
+        }else if(unit.equals("년")){
+            String[][] result = whenUnitIsYear(currentYear,currnetMonth,inputYear,inputMonth);
+            for(int i = 0;i < result.length; i++){
+                for(int j = 0; j < result[0].length; j++){
+                    showing.append(result[i][j]);
+                }
+                showing.append("\n");
+            }
+            this.add(showing);
+            revalidate();
+            repaint();
+        }else if(unit.equals("10년")){
+            String[] result = whenUnitIsDecade(currentYear,currnetMonth,inputYear,inputMonth);
+            for(String i:result){
+                showing.append(i);
+            }
+            this.add(showing);
+            revalidate();
+            repaint();
         }else{
             JLabel errorMsg = new JLabel("에러 발생");
             errorMsg.setSize(10,10);
             this.add(errorMsg);
+            revalidate();
+            repaint();
         }
-
 
         setVisible(true);
     }
@@ -90,18 +132,18 @@ public class VisualizationPanel extends JPanel {
         int filledCircleByMonth = currentMonth;
 
 
-        for(int i = 0;i <= filledCircleByYear; i++){
-            for(int j = 0; j <= visualization[0].length; j++){
+        for(int i = 0;i < filledCircleByYear - 1; i++){
+            for(int j = 0; j < visualization[0].length; j++){
                 visualization[i][j] = filledCircle;
             }
         }
-        for(int i = 0; i <= filledCircleByMonth; i++){
-            visualization[filledCircleByYear][i] = filledCircle;
+        for(int i = 0; i < filledCircleByMonth; i++){
+            visualization[filledCircleByYear -1 ][i] = filledCircle;
         }
-        for(int i = 0;i <= visualization.length; i++){
-            for(int j = 0; j <= visualization[0].length; j++){
-                if(visualization[i][j].equals(filledCircle))
-                visualization[i][j] = emptyCircle;
+        for(int i = 0;i < visualization.length; i++){
+            for(int j = 0; j < visualization[0].length; j++){
+                if(visualization[i][j] == null)
+                    visualization[i][j] = emptyCircle;
             }
         }
         return visualization;
@@ -120,17 +162,17 @@ public class VisualizationPanel extends JPanel {
         int tens = age / 10;
         int ones = age % 10;
 
-        for(int i = 0;i <= tens; i++){
-            for(int j = 0;j <= visualization[0].length;j++){
+        for(int i = 0;i < tens; i++){
+            for(int j = 0;j < visualization[0].length;j++){
                 visualization[i][j] = filledCircle;
             }
         }
-        for(int i = 0;i<= ones;i++){
+        for(int i = 0;i < ones;i++){
             visualization[tens][i] = filledCircle;
         }
-        for(int i = 0;i<=visualization.length;i++){
-            for(int j = 0;j<visualization[0].length;j++){
-                if(visualization[i][j] != filledCircle)
+        for(int i = 0; i < visualization.length; i++){
+            for(int j = 0; j<visualization[0].length; j++){
+                if(visualization[i][j] == null)
                     visualization[i][j] = emptyCircle;
             }
         }
@@ -157,10 +199,10 @@ public class VisualizationPanel extends JPanel {
             visualization[i] = filledCircle;
         if(ones > 5){
             visualization[ones] = filledCircle;
-            for(int i = tens + 1; i<= visualization.length; i++)
+            for(int i = tens + 1; i< visualization.length; i++)
                 visualization[i] = emptyCircle;
         }else{
-            for(int i = tens; i <= visualization.length-1; i++)
+            for(int i = tens; i < visualization.length; i++)
                 visualization[i] = emptyCircle;
         }
 
@@ -173,5 +215,22 @@ public class VisualizationPanel extends JPanel {
         frame.add(frame.currentPanel);
         revalidate();
         repaint();
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+    }
+
+    public void saveImage(){
+        BufferedImage image = new BufferedImage(showing.getWidth(),showing.getHeight(),BufferedImage.TYPE_3BYTE_BGR);
+        Graphics2D g2 = image.createGraphics();
+        showing.paint(g2);
+        try{
+            ImageIO.write(image, "png", new File(System.getProperty("user.home") + "/Downloads/LifeTime_Visualization.png"));
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
     }
 }

@@ -67,4 +67,20 @@ public class MainFrame extends JFrame{
         revalidate();
         repaint();
     }
+
+    public void switchFromMainToSetting(){
+        remove(currentPanel);
+        currentPanel = new SettingPanel(this);
+        add(currentPanel);
+        revalidate();
+        repaint();
+    }
+
+    public void switchFromSettingToMain(){
+        remove(currentPanel);
+        currentPanel = new MainPanel(this);
+        add(currentPanel);
+        revalidate();
+        repaint();
+    }
 }
