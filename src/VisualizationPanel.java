@@ -49,7 +49,7 @@ public class VisualizationPanel extends JPanel {
                 break;
             case 1:
                 toMain = new JButton("back to main");
-                saveImg = new JButton("saving for image");
+                saveImg = new JButton("save as an image");
         }
 
         this.add(toMain);
